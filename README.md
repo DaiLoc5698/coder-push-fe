@@ -1,24 +1,23 @@
-# test-fe
+# coder-push-fe
 
-## Project setup
+# Env
+  - node: 14.17.3
+  - yarn: 1.22.17
+  
+# How to start
+
+```
+git clone https://github.com/DaiLoc5698/coder-push-fe.git
+```
+```
+cd coder-push-fe
+```
 ```
 yarn install
 ```
-
-### Compiles and hot-reloads for development
 ```
 yarn serve
 ```
-
-### Compiles and minifies for production
 ```
-yarn build
+finished
 ```
-
-### Lints and fixes files
-```
-yarn lint
-```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
