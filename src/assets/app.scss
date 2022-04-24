@@ -3,3 +3,28 @@
 // Then import Bootstrap and BootstrapVue SCSS files (order is important)
 // @import 'node_modules/bootstrap/scss/bootstrap.scss';
 // @import 'node_modules/bootstrap-vue/src/index.scss';
+
+.b-toaster-slot {
+  max-width: 200px !important;
+}
+.toast-header {
+  border: none !important;
+  
+}
+.toast-body {
+  padding: 0 0.75rem 0.25rem 0.75rem !important;
+}
+.b-toast-info {
+  .toast-body {
+    color: #0c5460;
+    background-color: rgba(209, 236, 241, 0.85);
+    border-bottom-color: rgba(190, 229, 235, 0.85);
+  }
+}
+.b-toast-success {
+  .toast-body {
+    color: #155724;
+    background-color: rgba(212, 237, 218, 0.85);
+    border-bottom-color: rgba(195, 230, 203, 0.85);
+  }
+}

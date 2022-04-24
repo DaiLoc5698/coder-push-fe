@@ -111,10 +111,30 @@ export default {
           likedUserId: likedUserId,
         })
       })
-      .then(() => this.$emit('fetchCurrentUser'))
+      .then(response => response.json())
+      .then(user => {
+        if (user.newMatch) {
+          this.$bvToast.toast(`Send her a message now!`, {
+            title: 'New match!!',
+            autoHideDelay: 500,
+            appendToast: true,
+            variant: "success",
+          })
+        }
+
+        this.$emit('fetchCurrentUser')
+      })
     },
     async passHandler() {
       this.passUser(this.user._id)
+
+      this.$bvToast.toast('Keep discovering!', {
+        title: 'Not feeling it?',
+        autoHideDelay: 500,
+        appendToast: true,
+        variant: "info",
+      })
+
       this.$refs.carousel.next()
     },
     passUser(passedUserId) {
