@@ -2,23 +2,30 @@
   <div id="app">
     <div class="tinder">
       <BTabs end> 
-        <BTab>
+        <BTab lazy>
           <template #title>
             <b-icon icon="suit-heart-fill" scale="1" ></b-icon> Like
           </template>
-          <TinderLike />
+          <TinderLike v-if="users" :users="users" />
         </BTab>
-        <BTab>
+        <BTab lazy>
           <template #title>
             <b-icon icon="suit-heart-fill" scale="1" ></b-icon> Discover
           </template>
-          <TinderDiscover />
+          <TinderDiscover 
+            v-if="currentUser" 
+            :currentUser="currentUser" 
+            @fetchCurrentUser="fetchCurrentUser"
+          />
         </BTab>
-        <BTab>
+        <BTab lazy>
           <template #title>
             <b-icon icon="suit-heart-fill" scale="1" ></b-icon> Matches
           </template>
-          <TinderMatches />
+          <TinderMatches 
+            v-if="currentUser" 
+            :currentUser="currentUser"  
+          />
         </BTab>
       </BTabs>
     </div>
@@ -41,13 +48,49 @@ export default {
     TinderMatches,
     TinderDiscover,
     BIcon,
+  },
+  beforeCreate() {
+    localStorage.setItem('currentUser', "62640f1e55b4af61252d1074")
+  },
+  created() {
+    this.fetchUsers()
+    this.fetchCurrentUser()
+  },
+  data() {
+    const users = null
+    const currentUser = null
+    
+    return {
+      users,
+      currentUser
+    }
+  },
+  methods: {
+    fetchUsers() {
+      fetch("http://localhost:3000/user")
+        .then(response => response.json())
+        .then(response => {
+          this.users = response.users
+        })
+    },
+    fetchCurrentUser() {
+      const currentUserId = localStorage.getItem('currentUser')
+
+      if (!currentUserId) return 
+
+      fetch(`http://localhost:3000/user/${currentUserId}`)
+        .then(response => response.json())
+        .then(response => {
+          this.currentUser = response.user
+        })
+    }
   }
 }
 </script>
 
 <style lang="scss">
 #app {
-  
+  background: black;
   display: flex;
   justify-content: center;
   .tinder {
@@ -68,6 +111,7 @@ export default {
 }
 .tab-content {
   height: calc(100% - 42px);
+  overflow: scroll;
 }
 .tab-pane {
 }

@@ -1,5 +1,5 @@
 <template>
-  <div class="tinder-tab">
+  <div class="tinder-tab" v-if="user">
     <div>
       <b-carousel 
         :interval="0"
@@ -8,27 +8,36 @@
         img-height="480"
         v-model="slide"
         style="text-shadow: 1px 1px 2px #333;" 
+        ref='carousel'
+        @sliding-end="onSlideEnd"
       >
-        <template v-for="user in users"> 
-          <b-carousel-slide :key='user.key'>
-            <template #img>
-              <img
-                style="object-fit: cover; aspect-ratio: 2/3; width: 100%; height: 100%"
-                :src="user.image"
-                alt="image slot"
-              >
-            </template>
-          </b-carousel-slide>
-        </template>
+        <b-carousel-slide key='slide-user'>
+          <template #img>
+            <img
+              style="object-fit: cover; aspect-ratio: 2/3; width: 100%; height: 100%"
+              :src="user.avatar"
+              alt="image slot"
+            >
+          </template>
+        </b-carousel-slide>
+        <b-carousel-slide key='slide-blank'>
+          <template #img>
+            <img
+              style="object-fit: cover; aspect-ratio: 2/3; width: 100%; height: 100%"
+              src="https://wallpaperaccess.com/full/1397755.jpg"
+              alt="image slot"
+            >
+          </template>
+        </b-carousel-slide>
       </b-carousel>
 
-      <p class="pt-1 pl-2 text-muted">{{users[slide].name}}, {{users[slide].age}}</p>
+      <p class="pt-1 pl-2 text-muted">{{user.name}}, {{user.age}}</p>
 
       <div class="actions">
-        <b-button class="mr-2 danger">
+        <b-button class="mr-2 danger" @click="passHandler(user)">
           <b-icon icon="x-circle" scale="2" ></b-icon>  
         </b-button>
-        <b-button class="ml-2 success">
+        <b-button class="ml-2 success" @click="likeHandler(user)">
           <b-icon icon="suit-heart-fill" scale="2" ></b-icon>
         </b-button>
       </div>      
@@ -49,33 +58,78 @@ export default {
   },
   name: 'TinderDiscover',
   props: {
-
+    currentUser: {
+      type: Object,
+      default: () => {}
+    }
+  },
+  created() {
+    this.fetchRandomUser()
   },
   data() { 
     const slide = 0
-    const users = [
-      { 
-        id: 1,
-        image: 'https://nhacchuonghinhnen.com/wp-content/uploads/2020/03/hinh-nen-gai-xinh-full-hd-cho-dien-thoai-2-scaled.jpg',
-        name: 'name1',
-        age: '24',
-      },
-      { 
-        id: 2,
-        image: 'https://luv.vn/wp-content/uploads/2021/11/avatar-gai-xinh-17.jpg',
-        name: 'name2',
-        age: '24',
-      },
-      { 
-        id: 3,
-        image: 'https://luv.vn/wp-content/uploads/2021/10/hinh-nen-gai-xinh-11-1.jpg',
-        name: 'name3',
-        age: '24',
-      }
-    ]
+    const user = null
+
     return {
-      users,
       slide,
+      user,
+    }
+  },
+  methods: {
+    fetchRandomUser() {
+      return fetch(`http://localhost:3000/user/random?currentUser=${this.currentUser.id}`)
+        .then(response => response.json())
+        .then(response => {
+          this.user = response.users[0]
+        })
+    },
+    async onSlideEnd(slide) {  
+      if (slide%2 === 1) {
+        this.fetchRandomUser()
+      } 
+      
+      setTimeout(() => {
+        if (slide%2 !== 0) {
+          this.$refs.carousel.next()
+        }
+      }, 0)
+      
+    },
+    async likeHandler() {
+      this.likeUser(this.user._id)
+      this.$refs.carousel.next()
+    },
+    likeUser(likedUserId) {
+      return fetch("http://localhost:3000/user/like", {
+        method: 'POST',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          currentUser: this.currentUser, 
+          likedUserId: likedUserId,
+        })
+      })
+      .then(() => this.$emit('fetchCurrentUser'))
+    },
+    async passHandler() {
+      this.passUser(this.user._id)
+      this.$refs.carousel.next()
+    },
+    passUser(passedUserId) {
+      return fetch("http://localhost:3000/user/pass", {
+        method: 'POST',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          currentUser: this.currentUser, 
+          passedUserId: passedUserId,
+        })
+      })
+      .then(() => this.$emit('fetchCurrentUser'))
     }
   },
 }
